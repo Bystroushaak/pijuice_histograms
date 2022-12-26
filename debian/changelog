@@ -1,3 +1,9 @@
+pijuice-histograms (0.0.2) stable; urgency=medium
+
+  * First working version which can generate reports. 
+
+ -- Bystroushaak <bystrousak@kitakitsune.org>  Mon, 26 Dec 2022 20:00:07 +0100
+
 pijuice-histograms (0.0.1) stable; urgency=medium
 
   * Created.

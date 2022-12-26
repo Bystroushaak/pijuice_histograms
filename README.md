@@ -11,6 +11,13 @@ make
 
 The details of the deb package build process are explained [here](https://opensource.com/article/20/4/package-python-applications-linux).
 
+### Add new entry to changelog
+Using [dch](https://manpages.debian.org/jessie/devscripts/dch.1.en.html):
+
+`dch -i`
+
+Don't forget to have set your 
+
 ## License
 
 Distributed under the MIT License. See [LICENSE.txt](LICENSE.txt) for more information.
