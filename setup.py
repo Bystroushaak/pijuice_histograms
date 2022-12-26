@@ -11,4 +11,5 @@ setup(
     description='Histograms created from pijuice data.',
     packages=find_packages('src'),
     package_dir={'': 'src'},
+    scripts=['scripts/pijuice_histograms_logger'],
 )

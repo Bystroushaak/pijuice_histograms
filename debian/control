@@ -8,6 +8,6 @@ Standards-Version: 3.9.5
 
 Package: pijuice-histograms
 Architecture: all
-Pre-Depends: dpkg (>= 1.16.1), python3.8, ${misc:Pre-Depends}
+Pre-Depends: dpkg (>= 1.16.1), python3, ${misc:Pre-Depends}
 Depends: ${python3:Depends}, pijuice-base
 Description: Histograms created from pijuice data.
