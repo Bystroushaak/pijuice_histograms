@@ -21,13 +21,14 @@ def generate_webpage_for_last_month(sqlite_path: str, report_path: str):
     os.makedirs(report_path, exist_ok=True)
 
     report = open(os.path.join(report_path, "report.html"), "wt")
-    report.write("""<!DOCTYPE html>
+    report.write(f"""<!DOCTYPE html>
 <html>
 <head>
   <title>Bystroushaak's blog</title>
 </head>
 <body>
 <h1>SolarPi report</h1>
+<p>Generated <code>{datetime.now().isoformat()}</code></p>
 """)
 
     for cnt, date in tqdm.tqdm(list(enumerate(ranges))):
