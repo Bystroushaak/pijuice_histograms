@@ -24,7 +24,7 @@ def generate_webpage_for_last_month(sqlite_path: str, report_path: str):
     report.write(f"""<!DOCTYPE html>
 <html>
 <head>
-  <title>Bystroushaak's blog</title>
+  <title>SolarPi report</title>
 </head>
 <body>
 <h1>SolarPi report</h1>
