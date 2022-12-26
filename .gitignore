@@ -1,0 +1,11 @@
+*.pyc
+MANIFEST
+dist/*
+src/*.egg-info
+docs/_build
+.coverage
+htmlcov/*
+.cache/*
+build/*
+/deb_build/*
+.idea/*
