@@ -1,8 +1,9 @@
 #! /usr/bin/env python3
 import sys
+import os.path
 import argparse
 
-from pijuice_histograms.collector import DatapointCollector
+from pijuice_histograms.generator import _print_all_values
 
 
 if __name__ == '__main__':
@@ -14,10 +15,8 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    collector = DatapointCollector(args.PATH)
+    if not os.path.exists(args.PATH):
+        sys.stderr.write(f"`{args.PATH}` doesn't exists!\n")
+        sys.exit(1)
 
-    try:
-        collector.run()
-    except KeyboardInterrupt:
-        collector.save()
-        sys.exit(0)
+    _print_all_values(args.PATH)
