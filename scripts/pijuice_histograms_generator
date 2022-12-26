@@ -3,20 +3,24 @@ import sys
 import os.path
 import argparse
 
-from pijuice_histograms.generator import _print_all_values
+from pijuice_histograms.generator import generate_webpage_for_last_month
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "PATH",
-        help="Path to the sqlite file where the data will be stored."
+        "SQLITE_PATH",
+        help="Path to the sqlite file with datapoints."
+    )
+    parser.add_argument(
+        "REPORT_PATH",
+        help="Path to the directory where the report will be stored."
     )
 
     args = parser.parse_args()
 
-    if not os.path.exists(args.PATH):
-        sys.stderr.write(f"`{args.PATH}` doesn't exists!\n")
+    if not os.path.exists(args.SQLITE_PATH):
+        sys.stderr.write(f"`{args.SQLITE_PATH}` doesn't exists!\n")
         sys.exit(1)
 
-    _print_all_values(args.PATH)
+    generate_webpage_for_last_month(args.SQLITE_PATH, args.REPORT_PATH)

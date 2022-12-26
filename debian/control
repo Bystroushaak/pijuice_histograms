@@ -9,5 +9,5 @@ Standards-Version: 3.9.5
 Package: pijuice-histograms
 Architecture: all
 Pre-Depends: dpkg (>= 1.16.1), python3, ${misc:Pre-Depends}
-Depends: ${python3:Depends}, pijuice-base
+Depends: ${python3:Depends}, pijuice-base, python3-matplotlib, python3-tqdm
 Description: Histograms created from pijuice data.
