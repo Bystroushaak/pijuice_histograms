@@ -1,4 +1,5 @@
 import time
+import sqlite3
 from enum import Enum
 from typing import Optional
 
@@ -48,14 +49,48 @@ class Storage:
     def __init__(self, path: str):
         self.path = path
 
+        self.database = sqlite3.connect(self.path)
+        self.database.row_factory = sqlite3.Row
+
+        self.create_storage()
+
     def add_datapoint(self, datapoint: Datapoint):
         print(datapoint)
 
+        cursor = self.database.cursor()
+        cursor.execute(
+            """
+            INSERT INTO SolarPi(timestamp, power_type, voltage, current, temperature)
+            VALUES (?, ?, ?, ?, ?);
+            """,
+            (
+                datapoint.timestamp,
+                datapoint.power_type.value,
+                datapoint.battery.voltage,
+                datapoint.battery.current,
+                datapoint.battery.temperature,
+            )
+        )
+
     def save(self):
-        pass
+        self.database.commit()
 
     def create_storage(self):
-        pass
+        cursor = self.database.cursor()
+
+        cursor.execute(
+            """
+            CREATE TABLE IF NOT EXISTS SolarPi(
+                timestamp INT PRIMARY KEY,
+                power_type INT,
+                voltage INT,
+                current INT,
+                temperature INT
+            );
+            """
+        )
+
+        self.database.commit()
 
 
 class DatapointCollector:
