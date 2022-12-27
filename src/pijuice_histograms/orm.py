@@ -87,11 +87,21 @@ class Storage:
             )
         )
 
+    def get_power_status_between(self, from_ts, to_ts) -> Iterator[Datapoint]:
+        cursor = self.database.cursor()
+
+        cursor.execute(
+            "SELECT timestamp, power_type FROM SolarPi WHERE timestamp BETWEEN ? AND ?;",
+            (from_ts, to_ts),
+        )
+        for data in cursor.fetchall():
+            yield (data["timestamp"], data["power_type"])
+
     def get_datapoints_between(self, from_ts, to_ts) -> Iterator[Datapoint]:
         cursor = self.database.cursor()
 
         cursor.execute(
-            "SELECT * FROM SolarPi WHERE (timestamp > ?) AND (timestamp < ?);",
+            "SELECT * FROM SolarPi WHERE timestamp BETWEEN ? AND ?;",
             (from_ts, to_ts),
         )
         for data in cursor.fetchall():
