@@ -1,6 +1,8 @@
 import os
+import shutil
 from datetime import datetime
 from datetime import timedelta
+from typing import Tuple
 
 import tqdm
 from matplotlib import pyplot
@@ -20,7 +22,7 @@ def generate_webpage_for_last_month(sqlite_path: str, report_path: str):
 
     os.makedirs(report_path, exist_ok=True)
 
-    report = open(os.path.join(report_path, "report.html"), "wt")
+    report = open(os.path.join(report_path, "report_.html"), "wt")
     report.write(f"""<!DOCTYPE html>
 <html>
 <head>
@@ -41,15 +43,17 @@ def generate_webpage_for_last_month(sqlite_path: str, report_path: str):
 </html>""")
     report.close()
 
-def generate_graph_for(storage: Storage, day=None, path=None):
+    shutil.move(os.path.join(report_path, "report_.html"), os.path.join(report_path, "report.html"))
+
+def generate_graph_for(storage: Storage, day: datetime = None, path :str = None):
     if day is None:
         day = datetime.now()
 
     timestamps = []
     status = []
-    for datapoint in storage.get_datapoints_between(*_get_timestamps_for(day)):
-        timestamps.append(datetime.fromtimestamp(datapoint.timestamp))
-        status.append(datapoint.power_type.value)
+    for timestamp, power_status in storage.get_power_status_between(*_get_timestamps_for(day)):
+        timestamps.append(datetime.fromtimestamp(timestamp))
+        status.append(power_status)
 
     pyplot.title(f"SolarPi status for {day.strftime('%Y-%m-%d')}")
     pyplot.xlabel("Time")
@@ -58,12 +62,12 @@ def generate_graph_for(storage: Storage, day=None, path=None):
     pyplot.axhline(y=2, color="orange", linestyle=":", label="Weak")
     pyplot.axhline(y=1, color="r", linestyle=":", label="Bad or not present")
     pyplot.legend(loc = 'best')
-    pyplot.xlim(*_get_datetimes_for(day, day))
+    pyplot.xlim(*_get_dayrange_for(day))
 
     date_fmt = DateFormatter("%H:%M:%S")
     pyplot.gca().xaxis.set_major_formatter(date_fmt)
 
-    pyplot.bar(timestamps, status)
+    pyplot.plot(timestamps, status)
     pyplot.gcf().autofmt_xdate()
 
     if path is None:
@@ -74,8 +78,8 @@ def generate_graph_for(storage: Storage, day=None, path=None):
         pyplot.close()
 
 
-def _get_timestamps_for(day):
-    start, end = _get_datetimes_for(day, day)
+def _get_timestamps_for(day: datetime) -> Tuple[float, float]:
+    start, end = _get_dayrange_for(day)
 
     start_ts = datetime.timestamp(start)
     end_ts = datetime.timestamp(end)
@@ -83,8 +87,8 @@ def _get_timestamps_for(day):
     return (start_ts, end_ts)
 
 
-def _get_datetimes_for(start, end):
-    start = start.replace(hour=0, minute=0, second=0, microsecond=0)
-    end = end.replace(hour=23, minute=59, second=59, microsecond=0)
+def _get_dayrange_for(day: datetime) -> Tuple[datetime, datetime]:
+    start = day.replace(hour=0, minute=0, second=0, microsecond=0)
+    end = start + timedelta(days = 1)
 
     return start, end
