@@ -22,7 +22,7 @@ def generate_webpage_for_last_month(sqlite_path: str, report_path: str):
 
     os.makedirs(report_path, exist_ok=True)
 
-    report = open(os.path.join(report_path, "report_.html"), "wt")
+    report = open(os.path.join(report_path, "index_.html"), "wt")
     report.write(
         f"""<!DOCTYPE html>
 <html>
@@ -48,8 +48,8 @@ def generate_webpage_for_last_month(sqlite_path: str, report_path: str):
     report.close()
 
     shutil.move(
-        os.path.join(report_path, "report_.html"),
-        os.path.join(report_path, "report.html"),
+        os.path.join(report_path, "index_.html"),
+        os.path.join(report_path, "index.html"),
     )
 
 
