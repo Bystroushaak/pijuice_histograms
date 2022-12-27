@@ -1,3 +1,13 @@
+pijuice-histograms (0.0.3) stable; urgency=medium
+
+  * Report graphs changed to line from bars.
+  * SQL queries optimized, so it is now much faster.
+  * Generate index.html instead of report.html.
+  * Use atomic update.
+  * Fixed some minor bugs.
+
+ -- Bystroushaak <bystrousak@kitakitsune.org>  Tue, 27 Dec 2022 15:50:10 +0100
+
 pijuice-histograms (0.0.2) stable; urgency=medium
 
   * First working version which can generate reports. 
