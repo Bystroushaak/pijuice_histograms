@@ -18,12 +18,13 @@ def generate_webpage_for_last_month(sqlite_path: str, report_path: str):
     today = datetime.today()
     ranges = [today]
     for x in range(30):
-        ranges.append(today - timedelta(days = x + 1))
+        ranges.append(today - timedelta(days=x + 1))
 
     os.makedirs(report_path, exist_ok=True)
 
     report = open(os.path.join(report_path, "report_.html"), "wt")
-    report.write(f"""<!DOCTYPE html>
+    report.write(
+        f"""<!DOCTYPE html>
 <html>
 <head>
   <title>SolarPi report</title>
@@ -31,7 +32,8 @@ def generate_webpage_for_last_month(sqlite_path: str, report_path: str):
 <body>
 <h1>SolarPi report</h1>
 <p>Generated <code>{datetime.now().isoformat()}</code></p>
-""")
+"""
+    )
 
     for cnt, date in tqdm.tqdm(list(enumerate(ranges))):
         report.write(f"<h2>{date.strftime('%Y-%m-%d')}</h2>\n")
@@ -39,19 +41,27 @@ def generate_webpage_for_last_month(sqlite_path: str, report_path: str):
 
         generate_graph_for(storage, date, os.path.join(report_path, f"{cnt}.png"))
 
-    report.write("""</body>
-</html>""")
+    report.write(
+        """</body>
+</html>"""
+    )
     report.close()
 
-    shutil.move(os.path.join(report_path, "report_.html"), os.path.join(report_path, "report.html"))
+    shutil.move(
+        os.path.join(report_path, "report_.html"),
+        os.path.join(report_path, "report.html"),
+    )
 
-def generate_graph_for(storage: Storage, day: datetime = None, path :str = None):
+
+def generate_graph_for(storage: Storage, day: datetime = None, path: str = None):
     if day is None:
         day = datetime.now()
 
     timestamps = []
     status = []
-    for timestamp, power_status in storage.get_power_status_between(*_get_timestamps_for(day)):
+    for timestamp, power_status in storage.get_power_status_between(
+        *_get_timestamps_for(day)
+    ):
         timestamps.append(datetime.fromtimestamp(timestamp))
         status.append(power_status)
 
@@ -61,7 +71,7 @@ def generate_graph_for(storage: Storage, day: datetime = None, path :str = None)
     pyplot.axhline(y=3, color="b", linestyle=":", label="Present")
     pyplot.axhline(y=2, color="orange", linestyle=":", label="Weak")
     pyplot.axhline(y=1, color="r", linestyle=":", label="Bad or not present")
-    pyplot.legend(loc = 'best')
+    pyplot.legend(loc="best")
     pyplot.xlim(*_get_dayrange_for(day))
 
     date_fmt = DateFormatter("%H:%M:%S")
@@ -89,6 +99,6 @@ def _get_timestamps_for(day: datetime) -> Tuple[float, float]:
 
 def _get_dayrange_for(day: datetime) -> Tuple[datetime, datetime]:
     start = day.replace(hour=0, minute=0, second=0, microsecond=0)
-    end = start + timedelta(days = 1)
+    end = start + timedelta(days=1)
 
     return start, end
