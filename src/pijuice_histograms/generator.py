@@ -44,10 +44,9 @@ def generate_webpage_for_last_month(sqlite_path: str, report_path: str):
     )
 
     for cnt, date in tqdm.tqdm(list(enumerate(ranges))):
-        report.write(f"<h2>{date.strftime('%Y-%m-%d')}</h2>\n")
-        report.write(f"<img src='{cnt}.png' />\n")
-
-        generate_graph_for(storage, date, os.path.join(report_path, f"{cnt}.png"))
+        if generate_graph_for(storage, date, os.path.join(report_path, f"{cnt}.png")):
+            report.write(f"<h2>{date.strftime('%Y-%m-%d')}</h2>\n")
+            report.write(f"<img src='{cnt}.png' />\n")
 
     report.write(
         """</body>
@@ -61,7 +60,9 @@ def generate_webpage_for_last_month(sqlite_path: str, report_path: str):
     )
 
 
-def generate_graph_for(storage: Storage, day: datetime = None, path: str = None):
+def generate_graph_for(
+    storage: Storage, day: datetime = None, path: str = None
+) -> bool:
     if day is None:
         day = datetime.now()
 
@@ -72,6 +73,9 @@ def generate_graph_for(storage: Storage, day: datetime = None, path: str = None)
     ):
         timestamps.append(datetime.fromtimestamp(timestamp))
         status.append(power_status)
+
+    if not timestamps and not status:
+        return False
 
     pyplot.title(f"SolarPi status for {day.strftime('%Y-%m-%d')}")
     pyplot.xlabel("Time")
@@ -95,6 +99,8 @@ def generate_graph_for(storage: Storage, day: datetime = None, path: str = None)
         pyplot.gcf().set_size_inches(10, 4)
         pyplot.savefig(path, dpi=150)
         pyplot.close()
+
+    return True
 
 
 def _get_timestamps_for(day: datetime) -> Tuple[float, float]:
