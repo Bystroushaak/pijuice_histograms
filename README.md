@@ -1,4 +1,6 @@
-Generate histograms about your solar power from pijuice data.
+Generate histograms about your solar power from pijuice data, which look like this:
+
+![Screenshot](docs/screenshot.png)
 
 ## Build
 

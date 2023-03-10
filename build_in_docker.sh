@@ -12,3 +12,4 @@ mkdir -p /code/deb_build
 find /tmp -maxdepth 1 -name "*.deb" -exec cp {} /code/deb_build \;
 
 chmod -R 777 /code/deb_build
+chown 1000:1000 -R /code/deb_build
