@@ -31,7 +31,7 @@ def generate_webpage_for_last_month(sqlite_path: str, report_path: str):
 </head>
 <body>
 <h1>SolarPi report</h1>
-<p>Generated <code>{datetime.now().isoformat()}</code></p>
+<p>Generated <code>{datetime.now().isoformat()}</code> by <a href="https://github.com/Bystroushaak/pijuice_histograms">pijuice_histograms</a>.</p>
 <p>From the manual:</p>
 <ul>
     <li><b>NOT_PRESENT</b> - Power supply is not connected to the PiJuice micro USB connector</li>
@@ -39,7 +39,7 @@ def generate_webpage_for_last_month(sqlite_path: str, report_path: str):
     <li><b>WEAK</b> - Power supply is connected but is weak i.e. power supply cannot charge the PiJuice and provide power to the Raspberry Pi. DPM is active, see - <a href="https://github.com/PiSupply/PiJuice/tree/master/Hardware#usb-micro-input">https://github.com/PiSupply/PiJuice/tree/master/Hardware#usb-micro-input</a></li>
     <li><b>PRESENT</b> - Power supply is connected and is providing good power to the PiJuice</li>
 </ul>
-<p>Which basically means that everything under <b>WEAK</b> is <i>"not using the solar cell input at all"</i>, and <b>WEAK</b> is <i>"using it maybe, sometimes when DPM works"</i>. Ideally, it should be <b>PRESENT</b>.</p>
+<p>Which basically means that everything under <b>WEAK</b> is <i>"not using the solar cell input at all"</i>, and <b>WEAK</b> is <i>"using it maybe, sometimes when DPM works"</i>. Ideally, it should be <b>PRESENT</b>. That is what the blue line is showing. Red line shows the battery charge.</p>
 """
     )
 
@@ -68,11 +68,13 @@ def generate_graph_for(
 
     timestamps = []
     status = []
-    for timestamp, power_status in storage.get_power_status_between(
+    charges = []
+    for timestamp, power_status, charge in storage.get_status_between(
         *_get_timestamps_for(day)
     ):
         timestamps.append(datetime.fromtimestamp(timestamp))
         status.append(power_status)
+        charges.append(charge)
 
     if not timestamps and not status:
         return False
@@ -80,17 +82,24 @@ def generate_graph_for(
     pyplot.title(f"SolarPi status for {day.strftime('%Y-%m-%d')}")
     pyplot.xlabel("Time")
     pyplot.ylabel("Solar status")
-    pyplot.axhline(y=3, color="green", linestyle=":", label="Present")
-    pyplot.axhline(y=2, color="orange", linestyle=":", label="Weak")
-    pyplot.axhline(y=1, color="r", linestyle=":", label="Bad")
-    pyplot.axhline(y=0, color="purple", linestyle=":", label="Not present")
-    pyplot.legend(loc="best")
+
+    fig, power_axis = pyplot.subplots()
+    power_axis.axhline(y=3, color="green", linestyle=":", label="Present")
+    power_axis.axhline(y=2, color="orange", linestyle=":", label="Weak")
+    power_axis.axhline(y=1, color="r", linestyle=":", label="Bad")
+    power_axis.axhline(y=0, color="purple", linestyle=":", label="Not present")
+    power_axis.legend(loc="best")
     pyplot.xlim(*_get_dayrange_for(day))
+
+    charge_axis = power_axis.twinx()
+    charge_axis.plot(timestamps, charges, color="red")
+    charge_axis.set_ylabel('Battery charge (%)', color='red')
+    charge_axis.set_ylim(-4,104)
 
     date_fmt = DateFormatter("%H:%M:%S")
     pyplot.gca().xaxis.set_major_formatter(date_fmt)
 
-    pyplot.plot(timestamps, status)
+    power_axis.plot(timestamps, status)
     pyplot.gcf().autofmt_xdate()
 
     if path is None:

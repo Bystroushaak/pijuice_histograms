@@ -9,7 +9,9 @@ from pijuice_histograms.orm import PowerTypeEnum
 
 
 class DatapointCollector:
-    SAVE_EVERY = 10 * 60 / 5  # 10 minutes
+    SAVE_EVERY = 10 * 60
+    NEXT_SAVE = time.time() + SAVE_EVERY
+    SLEEP_SECS = 60
 
     def __init__(self, db_path):
         self.db_path = db_path
@@ -18,17 +20,15 @@ class DatapointCollector:
         self.pijuice = PiJuice(1, 0x14)
 
     def run(self):
-        cnt = self.SAVE_EVERY
         while True:
             datapoint = self._get_datapoint()
             self.storage.add_datapoint(datapoint)
 
-            cnt -= 1
-            if cnt <= 0:
-                cnt = self.SAVE_EVERY
+            if time.time() > self.SAVE_EVERY:
                 self.save()
+                self.NEXT_SAVE = time.time() + self.SAVE_EVERY
 
-            time.sleep(5)
+            time.sleep(self.SLEEP_SECS)
 
     def _get_datapoint(self) -> Datapoint:
         datapoint = Datapoint()
@@ -43,9 +43,13 @@ class DatapointCollector:
             voltage=status.GetBatteryVoltage()["data"] / 1000,
             current=status.GetBatteryCurrent()["data"] / 1000,
             temperature=status.GetBatteryTemperature()["data"],
+            charge=status.GetChargeLevel()["data"],
         )
 
         return datapoint
 
     def save(self):
         self.storage.save()
+
+    def close(self):
+        self.storage.close()

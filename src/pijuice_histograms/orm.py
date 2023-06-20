@@ -1,7 +1,7 @@
 import time
 import sqlite3
 from enum import Enum
-from typing import Iterator, Optional
+from typing import Tuple, Iterator, Optional
 
 
 class PowerTypeEnum(Enum):
@@ -12,10 +12,11 @@ class PowerTypeEnum(Enum):
 
 
 class BatteryInfo:
-    def __init__(self, voltage, current, temperature):
+    def __init__(self, voltage, current, temperature, charge):
         self.voltage = voltage
         self.current = current
         self.temperature = temperature
+        self.charge = charge
 
 
 class Datapoint:
@@ -39,6 +40,7 @@ class Datapoint:
         voltage={self.battery.voltage},
         current={self.battery.current},
         temperature={self.battery.temperature},
+        charge={self.battery.charge},
     ),
 )"""
 
@@ -62,7 +64,8 @@ class Storage:
                 power_type INT,
                 voltage INT,
                 current INT,
-                temperature INT
+                temperature INT,
+                charge INT
             );
             """
         )
@@ -75,8 +78,8 @@ class Storage:
         cursor = self.database.cursor()
         cursor.execute(
             """
-            INSERT INTO SolarPi(timestamp, power_type, voltage, current, temperature)
-            VALUES (?, ?, ?, ?, ?);
+            INSERT INTO SolarPi(timestamp, power_type, voltage, current, temperature, charge)
+            VALUES (?, ?, ?, ?, ?, ?);
             """,
             (
                 datapoint.timestamp,
@@ -84,18 +87,19 @@ class Storage:
                 datapoint.battery.voltage,
                 datapoint.battery.current,
                 datapoint.battery.temperature,
+                datapoint.battery.charge,
             )
         )
 
-    def get_power_status_between(self, from_ts, to_ts) -> Iterator[Datapoint]:
+    def get_status_between(self, from_ts, to_ts) -> Iterator[Tuple[int, int, int]]:
         cursor = self.database.cursor()
 
         cursor.execute(
-            "SELECT timestamp, power_type FROM SolarPi WHERE timestamp BETWEEN ? AND ?;",
+            "SELECT timestamp, power_type, charge FROM SolarPi WHERE timestamp BETWEEN ? AND ?;",
             (from_ts, to_ts),
         )
         for data in cursor.fetchall():
-            yield (data["timestamp"], data["power_type"])
+            yield (data["timestamp"], data["power_type"], data["charge"])
 
     def get_datapoints_between(self, from_ts, to_ts) -> Iterator[Datapoint]:
         cursor = self.database.cursor()
@@ -112,8 +116,12 @@ class Storage:
                     voltage=data["voltage"],
                     current=data["current"],
                     temperature=data["temperature"],
+                    charge=data["charge"]
                 )
             )
 
     def save(self):
         self.database.commit()
+
+    def close(self):
+        self.database.close()
