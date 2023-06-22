@@ -40,7 +40,7 @@ def generate_webpage_for_last_month(sqlite_path: str, report_path: str):
     <li><b>WEAK</b> - Power supply is connected but is weak i.e. power supply cannot charge the PiJuice and provide power to the Raspberry Pi. DPM is active, see - <a href="https://github.com/PiSupply/PiJuice/tree/master/Hardware#usb-micro-input">https://github.com/PiSupply/PiJuice/tree/master/Hardware#usb-micro-input</a></li>
     <li><b>PRESENT</b> - Power supply is connected and is providing good power to the PiJuice</li>
 </ul>
-<p>Which basically means that everything under <b>WEAK</b> is <i>"not using the solar cell input at all"</i>, and <b>WEAK</b> is <i>"using it maybe, sometimes when DPM works"</i>. Ideally, it should be <b>PRESENT</b>. That is what the blue line is showing. Red line shows the battery charge.</p>
+<p>Which basically means that everything under <b>WEAK</b> is <i>"not using the solar cell input at all"</i>, and <b>WEAK</b> is <i>"using it maybe, sometimes when DPM works"</i>. Ideally, it should be <b>PRESENT</b>. That is what the blue line is showing. Red/green line shows the battery charge (green -> powered from solar, red -> powered from grid).</p>
 """
     )
 
