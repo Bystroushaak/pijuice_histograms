@@ -7,6 +7,7 @@ from typing import Tuple
 import tqdm
 from matplotlib import pyplot
 from matplotlib.dates import DateFormatter
+from matplotlib.collections import LineCollection
 
 from pijuice_histograms.orm import Storage
 
@@ -66,15 +67,17 @@ def generate_graph_for(
     if day is None:
         day = datetime.now()
 
-    timestamps = []
     status = []
     charges = []
-    for timestamp, power_status, charge in storage.get_status_between(
+    timestamps = []
+    charger_ons = []
+    for timestamp, power_status, charge, charger_on in storage.get_status_between(
         *_get_timestamps_for(day)
     ):
         timestamps.append(datetime.fromtimestamp(timestamp))
         status.append(power_status)
         charges.append(charge)
+        charger_ons.append(charger_on)
 
     if not timestamps and not status:
         return False
@@ -92,8 +95,10 @@ def generate_graph_for(
     pyplot.xlim(*_get_dayrange_for(day))
 
     charge_axis = power_axis.twinx()
-    charge_axis.plot(timestamps, charges, color="red")
-    charge_axis.set_ylabel('Battery charge (%)', color='red')
+    colors = ["red" if charger_on else "green" for charger_on in charger_ons]
+    for i in range(len(timestamps)-1):
+        charge_axis.plot(timestamps[i:i+2], charges[i:i+2], color=colors[i])
+    charge_axis.set_ylabel('Battery charge (%) (red=grid, green=solar)', color='red')
     charge_axis.set_ylim(-4,104)
 
     date_fmt = DateFormatter("%H:%M:%S")

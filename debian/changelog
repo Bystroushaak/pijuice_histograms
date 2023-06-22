@@ -1,3 +1,9 @@
+pijuice-histograms (0.0.5) stable; urgency=medium
+
+  * Added differentiation between charger on/off state. 
+
+ -- bystrousak <bystrousak@i7>  Thu, 22 Jun 2023 19:05:47 +0200
+
 pijuice-histograms (0.0.4) stable; urgency=medium
 
   * Added tracking of the battery charge.

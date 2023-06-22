@@ -44,6 +44,7 @@ class DatapointCollector:
             current=status.GetBatteryCurrent()["data"] / 1000,
             temperature=status.GetBatteryTemperature()["data"],
             charge=status.GetChargeLevel()["data"],
+            charger_on=status.GetStatus()["data"]["powerInput5vIo"] == "PRESENT",
         )
 
         return datapoint
